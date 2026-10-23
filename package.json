@@ -1,0 +1,25 @@
+{
+  "name": "apextech-ecommerce-platform",
+  "version": "1.0.0",
+  "description": "Full-Stack E-Commerce Platform built with React, Node.js, Express, and MySQL/MySQL2",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "backend": "cd backend && node server.js",
+    "backend:dev": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm start",
+    "build:frontend": "cd frontend && npm run build",
+    "test:api": "cd backend && node scripts/testApi.js",
+    "start": "cd backend && node server.js"
+  },
+  "keywords": [
+    "ecommerce",
+    "react",
+    "express",
+    "mysql",
+    "bootstrap",
+    "portfolio",
+    "full-stack"
+  ],
+  "author": "Full-Stack Developer",
+  "license": "MIT"
+}

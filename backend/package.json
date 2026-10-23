@@ -1,0 +1,31 @@
+{
+  "name": "apextech-backend",
+  "version": "1.0.0",
+  "description": "Full-Stack E-Commerce Platform REST API with MySQL/MySQL2 and JWT Authentication",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node database/seedRunner.js"
+  },
+  "keywords": [
+    "ecommerce",
+    "express",
+    "mysql",
+    "rest-api",
+    "jwt",
+    "portfolio"
+  ],
+  "author": "Full-Stack Developer",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.9.7",
+    "sqlite3": "^6.0.1"
+  }
+}
