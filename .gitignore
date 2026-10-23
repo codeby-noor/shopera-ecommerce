@@ -1,0 +1,36 @@
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Build outputs
+dist/
+build/
+
+# Temporary browser and diagnostic files
+.tmp-chrome-profile/
+.tmp-diag/
+.tmp-diag2/
+.tmp-diag3/
+
+# Local database files
+backend/data/*.db
+backend/data/*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
