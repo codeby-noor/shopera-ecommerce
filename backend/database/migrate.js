@@ -1,8 +1,8 @@
 const db = require('../config/db');
 
-async function migrate() {
+async function migrate(existingPool) {
   console.log('🔄 [Migration] Checking and updating database schema...');
-  const pool = await db.connect();
+  const pool = existingPool || (await db.connect());
 
   try {
     // 1. Check & Add brand column to products
@@ -33,7 +33,21 @@ async function migrate() {
       await pool.query('ALTER TABLE orders ADD COLUMN discount_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00 AFTER coupon_code');
     }
 
-    // 4. Create coupons table
+    // 4. Check & Add shipping_tier to orders
+    const [shippingCols] = await pool.query('SHOW COLUMNS FROM orders LIKE "shipping_tier"');
+    if (shippingCols.length === 0) {
+      console.log('➕ Adding "shipping_tier" column to orders table...');
+      await pool.query("ALTER TABLE orders ADD COLUMN shipping_tier VARCHAR(30) DEFAULT 'standard'");
+    }
+
+    // 5. Check & Add is_verified_purchase to reviews
+    const [reviewCols] = await pool.query('SHOW COLUMNS FROM reviews LIKE "is_verified_purchase"');
+    if (reviewCols.length === 0) {
+      console.log('➕ Adding "is_verified_purchase" column to reviews table...');
+      await pool.query('ALTER TABLE reviews ADD COLUMN is_verified_purchase TINYINT(1) DEFAULT 0');
+    }
+
+    // 6. Create coupons table
     console.log('➕ Ensuring "coupons" table exists...');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS coupons (

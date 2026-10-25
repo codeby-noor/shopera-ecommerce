@@ -1,8 +1,5 @@
--- ApexTech E-Commerce Database Schema (MySQL 8.0+)
--- Creates all tables with proper constraints, foreign keys, and indexes
-
-CREATE DATABASE IF NOT EXISTS apextech_ecommerce;
-USE apextech_ecommerce;
+-- SHOPERA E-Commerce Database Schema (MySQL 8.0+ / TiDB Cloud Starter compatible)
+-- Creates all required SHOPERA tables in the currently selected database without creating databases
 
 -- 1. Users Table
 CREATE TABLE IF NOT EXISTS users (

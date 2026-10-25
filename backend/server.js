@@ -20,14 +20,27 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(morgan('dev'));
+
+const defaultOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001'
+];
+const customOrigins = (process.env.CLIENT_URL || '')
+  .split(',')
+  .map(url => url.trim())
+  .filter(Boolean);
+const allowedOrigins = [...new Set([...defaultOrigins, ...customOrigins])];
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:3001',
-    process.env.CLIENT_URL
-  ].filter(Boolean),
+  origin: (origin, callback) => {
+    // Allow server-to-server requests or matching origins
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
   credentials: true
 }));
 
@@ -37,16 +50,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Health Check API
 app.get('/api/health', (req, res) => {
   const engine = db.getEngine() || 'disconnected';
-  const isFallback = typeof db.isFallback === 'function' ? db.isFallback() : (engine === 'sqlite');
+  const isHealthy = engine === 'mysql';
 
-  res.json({
-    status: 'healthy',
+  res.status(isHealthy ? 200 : 503).json({
+    status: isHealthy ? 'healthy' : 'unhealthy',
     platform: 'SHOPERA E-Commerce Platform API',
     database_engine: engine,
-    is_fallback: isFallback,
-    database_host: engine === 'mysql' ? (process.env.DB_HOST || 'localhost') : 'local_embedded',
-    database_port: engine === 'mysql' ? (parseInt(process.env.DB_PORT, 10) || 3306) : null,
-    database_name: engine === 'mysql' ? (process.env.DB_NAME || 'apextech_ecommerce') : 'ecommerce.db',
+    is_fallback: false,
+    database_host: process.env.DB_HOST || process.env.TIDB_HOST || 'localhost',
+    database_port: parseInt(process.env.DB_PORT || process.env.TIDB_PORT, 10) || ((process.env.DB_HOST || '').includes('tidbcloud.com') ? 4000 : 3306),
+    database_name: process.env.DB_NAME || process.env.TIDB_DATABASE || 'shopera',
     timestamp: new Date().toISOString()
   });
 });

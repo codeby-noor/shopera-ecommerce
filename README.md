@@ -16,7 +16,7 @@ A production-grade, enterprise-ready **Full-Stack E-Commerce Platform** designed
 - **Zero Vite / Zero Tailwind Dependency**: Custom, ultra-fast **Webpack 5 + Babel** frontend build setup adhering strictly to enterprise vanilla CSS and Bootstrap 5 standards.
 - **Server-Side Price & Inventory Integrity**: Unit prices, discount deductions, tax rates, and inventory limits are verified and calculated on the server—never trusting client-side totals.
 - **Role-Based Access Control (RBAC)**: Secure separation between customer shoppers and store administrators with signed JSON Web Tokens (JWT) and bcrypt password hashing.
-- **Universal Database Engine**: Built for MySQL 8.0 with `mysql2/promise` connection pooling, coupled with an intelligent auto-fallback engine (SQLite) so evaluators can run the entire project with zero external database configuration.
+- **Universal Database Engine**: Built for MySQL 8.0 with `mysql2/promise` connection pooling, SSL encryption for cloud providers (TiDB Cloud, Aiven), safe non-destructive table initialization, and separate on-demand seeding.
 - **Full Shopping Lifecycle**: Real-time product search, filtering, category navigation, multi-image view, dynamic shopping cart, saved wishlist, address book, simulated test checkout, order confirmation receipts, and tracking timelines.
 - **Comprehensive Admin Control Center**: Metrics dashboard, sales analytics by department, low-stock notifications, complete Product CRUD, Category CRUD, customer CRM, and live order fulfillment status updater.
 
@@ -35,9 +35,8 @@ graph TD
     RBAC["Admin RBAC Authorization Guard"]
     Validation["Input Validation Middleware"]
     
-    DB_Pool["MySQL2 / Database Adapter"]
-    MySQL[("MySQL 8.0 Database")]
-    Fallback[("SQLite Persistence Fallback")]
+    DB_Pool["MySQL2 Connection Pool (SSL Enabled)"]
+    MySQL[("MySQL 8.0 Database (Local / TiDB Cloud / Aiven)")]
 
     Client --> Router
     Router --> API
@@ -46,8 +45,7 @@ graph TD
     Auth --> RBAC
     RBAC --> Validation
     Validation --> DB_Pool
-    DB_Pool -->|Active MySQL Server| MySQL
-    DB_Pool -->|Offline Fallback Engine| Fallback
+    DB_Pool -->|Encrypted Pool Connection| MySQL
 ```
 
 ---
@@ -136,7 +134,7 @@ erDiagram
 | **Build System** | Webpack 5, Babel 7 (`@babel/preset-env`, `@babel/preset-react`), CSS Loader, HTML Webpack Plugin |
 | **Backend** | Node.js (v18 - v24), Express.js 4.19, CORS, Morgan, Dotenv |
 | **Authentication** | JSON Web Tokens (`jsonwebtoken`), `bcryptjs` (Salt Rounds: 10) |
-| **Database** | MySQL 8.0, `mysql2/promise` with Connection Pooling, SQLite3 compatibility fallback |
+| **Database** | MySQL 8.0, `mysql2/promise` with Connection Pooling, SSL Support |
 | **Containerization** | Docker, Docker Compose (`mysql:8.0` image with auto-initialization scripts) |
 
 ---
@@ -309,6 +307,64 @@ cd frontend
 npm run build
 ```
 The production bundle is compiled into `frontend/dist/`. When the backend runs in production mode (`NODE_ENV=production`), Express automatically serves this optimized bundle, allowing you to run the entire full-stack app from a single port (`5000`)!
+
+---
+
+## 🚀 Free Deployment Guide ($0/Month on Render & Cloud MySQL)
+
+You can deploy this full-stack project for **$0/month** using Render's free web service tier paired with a 100% free MySQL-compatible cloud database.
+
+### Step 1: Set Up Free Cloud MySQL (e.g., TiDB Cloud Serverless)
+1. Register for a free account at [TiDB Cloud](https://tidbcloud.com/) (Free forever, 5 GiB storage, 50M request units/month, no credit card required).
+2. Create a free **Serverless Cluster**.
+3. In the cluster console, select **Connect** and choose the **MySQL Client** format to view:
+   - **Host** (e.g., `gateway01.us-east-1.prod.aws.tidbcloud.com`)
+   - **Port** (typically `4000`)
+   - **User** (e.g., `xxxx.root`)
+   - **Password** (your generated database password)
+   - **Database** (e.g. `shopera` or default `test`)
+
+### Step 2: Initialize & Seed Database (One-time)
+Run the seeder from your local machine with the cloud connection variables:
+```bash
+# In backend directory
+DB_HOST="gateway01.us-east-1.prod.aws.tidbcloud.com" \
+DB_PORT="4000" \
+DB_USER="xxxx.root" \
+DB_PASSWORD="your_password" \
+DB_NAME="shopera" \
+DB_SSL="true" \
+npm run seed
+```
+*(On Windows PowerShell, use `$env:DB_HOST="..."; npm run seed`)*
+
+### Step 3: Deploy Backend on Render ($0/Month Free Tier)
+1. Go to [Render Dashboard](https://dashboard.render.com/) and click **New +** -> **Web Service**.
+2. Connect your GitHub repository.
+3. Configure settings:
+   - **Name**: `shopera-backend` (or your preferred name)
+   - **Region**: Choose the region closest to your cloud database
+   - **Branch**: `main`
+   - **Root Directory**: `backend`
+   - **Runtime**: `Node`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Instance Type**: `Free ($0/month)`
+4. Add the following **Environment Variables** in Render:
+   | Key | Value | Note |
+   | :--- | :--- | :--- |
+   | `NODE_ENV` | `production` | Production environment |
+   | `DB_HOST` | `<your-tidb-host>` | Cloud MySQL Host |
+   | `DB_PORT` | `4000` (or `3306`) | Cloud MySQL Port |
+   | `DB_USER` | `<your-tidb-user>` | Cloud MySQL User |
+   | `DB_PASSWORD` | `<your-tidb-password>` | Cloud MySQL Password |
+   | `DB_NAME` | `<your-database-name>` | Target Database |
+   | `DB_SSL` | `true` | Required for cloud MySQL providers |
+   | `JWT_SECRET` | `<random-64-character-string>` | Secret token key |
+   | `CLIENT_URL` | `<your-frontend-url>` | e.g., your Vercel or Netlify app URL |
+5. Click **Create Web Service**. Render will run `npm install` cleanly without any native SQLite/GLIBC crashes, verify the MySQL pool connection, and start Express.
+6. Verify your live health endpoint:
+   `https://shopera-backend.onrender.com/api/health`
 
 ---
 
