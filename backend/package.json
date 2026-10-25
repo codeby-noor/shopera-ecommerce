@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "seed": "node database/seedRunner.js"
+    "seed": "node database/seedRunner.js",
+    "migrate": "node database/migrate.js"
   },
   "keywords": [
     "ecommerce",
@@ -25,7 +26,6 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "mysql2": "^3.9.7",
-    "sqlite3": "^6.0.1"
+    "mysql2": "^3.9.7"
   }
 }

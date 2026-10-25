@@ -1,10 +1,11 @@
--- ApexTech Seed Data (MySQL 8.0+)
-USE apextech_ecommerce;
+-- SHOPERA Seed Data (MySQL 8.0+ / TiDB Cloud Starter compatible)
+-- Populates demo data directly in the selected database
 
 -- 1. Seed Users
 INSERT INTO users (id, name, email, password, role, phone, avatar_url) VALUES
-(1, 'Apex Admin', 'admin@apextech.com', '$2a$10$2IbbqitKQ43m8m7NMNz0leApK0DR/c3fSbt3KhSzErsF5pKaXWQBi', 'admin', '+1 (555) 019-2834', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80'),
-(2, 'John Doe', 'john@example.com', '$2a$10$ZUFA7Pw0dGuoK/gyoENAg.sEr4cuLIl6td3dD52h4UaMaTtNehCKW', 'user', '+1 (555) 432-8765', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80')
+(1, 'Shopera Admin', 'admin@shopera.com', '$2a$10$2IbbqitKQ43m8m7NMNz0leApK0DR/c3fSbt3KhSzErsF5pKaXWQBi', 'admin', '+1 (555) 019-2834', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80'),
+(2, 'John Doe', 'john@example.com', '$2a$10$ZUFA7Pw0dGuoK/gyoENAg.sEr4cuLIl6td3dD52h4UaMaTtNehCKW', 'user', '+1 (555) 432-8765', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80'),
+(3, 'Apex Admin', 'admin@apextech.com', '$2a$10$2IbbqitKQ43m8m7NMNz0leApK0DR/c3fSbt3KhSzErsF5pKaXWQBi', 'admin', '+1 (555) 019-2834', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80')
 ON DUPLICATE KEY UPDATE name=VALUES(name);
 
 -- 2. Seed Categories
