@@ -9,7 +9,7 @@ const resolveBaseUrl = () => {
   } catch (e) {
     // Ignore runtime environment inspection errors
   }
-  return 'http://localhost:5000/api';
+  return 'https://shopera-ecommerce.onrender.com/api';
 };
 
 // Base API configuration
