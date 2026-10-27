@@ -234,8 +234,8 @@ const ProductDetail = () => {
       <div className="row g-5">
         {/* Left: Gallery */}
         <div className="col-lg-6">
-          <div className="position-relative bg-white border border-light-subtle rounded-4 p-4 text-center mb-3 shadow-sm d-flex align-items-center justify-content-center"
-               style={{ minHeight: '440px' }}>
+          <div className="position-relative bg-white border border-light-subtle rounded-4 p-4 text-center mb-3 shadow-sm d-flex align-items-center justify-content-center product-detail-gallery-main"
+               style={{ minHeight: '380px' }}>
             {hasDiscount && (
               <span className="tag-badge position-absolute top-0 start-0 m-3" style={{ background: 'var(--color-accent-pink)', color: '#fff' }}>
                 SAVE {discountPercent}%

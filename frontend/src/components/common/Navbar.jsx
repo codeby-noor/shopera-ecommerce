@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
@@ -22,9 +22,12 @@ const Navbar = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [categoriesDropdownOpen, setCategoriesDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   const searchContainerRef = useRef(null);
   const mobileSearchRef = useRef(null);
+  const categoryScrollRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -80,6 +83,29 @@ const Navbar = () => {
     fetchCategories();
   }, []);
 
+  // Category horizontal scroll detection
+  const checkCategoryScroll = useCallback(() => {
+    if (categoryScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = categoryScrollRef.current;
+      setCanScrollLeft(scrollLeft > 6);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 6);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkCategoryScroll();
+    window.addEventListener('resize', checkCategoryScroll);
+    return () => window.removeEventListener('resize', checkCategoryScroll);
+  }, [categories, checkCategoryScroll]);
+
+  const scrollCategories = (direction) => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -260 : 260;
+      categoryScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      setTimeout(checkCategoryScroll, 320);
+    }
+  };
+
   // Debounced search autocomplete
   useEffect(() => {
     if (!searchQuery || searchQuery.trim().length < 2) {
@@ -122,30 +148,31 @@ const Navbar = () => {
 
   return (
     <header className="sticky-top">
-      {/* 1. Top Marketplace Utility Announcement Bar (Desktop only) */}
+      {/* 1. Top Marketplace Utility Announcement Bar (Desktop & Tablet) */}
       <div className="top-utility-bar d-none d-md-block">
         <div className="container d-flex justify-content-between align-items-center">
-          <div className="d-flex align-items-center gap-3">
-            <span className="top-announcement-badge">
-              <i className="bi bi-tag-fill me-1"></i>SHOPERA EXCLUSIVE
+          <div className="d-flex align-items-center gap-2 gap-lg-3 min-w-0">
+            <span className="top-announcement-badge flex-shrink-0">
+              <i className="bi bi-tag-fill me-1"></i>EXCLUSIVE
             </span>
-            <span>
-              Shop More. Live Better. &bull; Free Express Delivery on orders over $500 &bull; Use Code: <strong className="text-white">SHOPERA10</strong> for 10% off
+            <span className="text-truncate small">
+              <span className="d-none d-xl-inline">Shop More. Live Better. &bull; </span>
+              Free Express Delivery on orders over $500 &bull; Code: <strong className="text-white">SHOPERA10</strong> (-10%)
             </span>
           </div>
-          <div className="d-flex align-items-center gap-4">
-            <Link to="/track-order" className="d-flex align-items-center gap-1">
-              <i className="bi bi-geo-alt"></i>Track Order
+          <div className="d-flex align-items-center gap-3 gap-lg-4 text-nowrap flex-shrink-0 ms-2">
+            <Link to="/track-order" className="d-flex align-items-center gap-1 small">
+              <i className="bi bi-geo-alt"></i><span>Track Order</span>
             </Link>
-            <Link to="/faq" className="d-flex align-items-center gap-1">
-              <i className="bi bi-question-circle"></i>Help & FAQs
+            <Link to="/faq" className="d-none d-lg-flex align-items-center gap-1 small">
+              <i className="bi bi-question-circle"></i><span>Help & FAQs</span>
             </Link>
-            <Link to="/offers" className="d-flex align-items-center gap-1">
-              <i className="bi bi-tag-fill text-warning"></i>Offers & Deals
+            <Link to="/offers" className="d-flex align-items-center gap-1 small">
+              <i className="bi bi-percent text-warning"></i><span>Deals</span>
             </Link>
             {isAdmin && (
-              <Link to="/admin" className="text-warning fw-bold d-flex align-items-center gap-1">
-                <i className="bi bi-shield-check"></i>Admin Portal
+              <Link to="/admin" className="text-warning fw-bold d-flex align-items-center gap-1 small">
+                <i className="bi bi-shield-check"></i><span>Admin</span>
               </Link>
             )}
           </div>
@@ -359,7 +386,7 @@ const Navbar = () => {
             </div>
 
             {/* Action Icons & User Controls */}
-            <div className="d-flex align-items-center gap-3 ms-3">
+            <div className="d-flex align-items-center gap-2 gap-xl-3 ms-2 ms-xl-3 flex-shrink-0">
               {/* International Currency Selector */}
               <CurrencySelector />
 
@@ -804,27 +831,63 @@ const Navbar = () => {
         </>
       )}
 
-      {/* 6. Desktop Category Navigation Strip */}
+      {/* 6. Desktop Category Navigation Strip with Smooth Scroll Controls */}
       <div className="category-nav-strip d-none d-lg-block">
-        <div className="container d-flex align-items-center gap-1 overflow-x-auto">
-          <Link to="/offers" className="category-nav-link highlight text-nowrap">
-            <i className="bi bi-percent"></i>Coupons & Offers
-          </Link>
-          <Link to="/products" className="category-nav-link text-nowrap">
-            All Products
-          </Link>
-          {categories.slice(0, 8).map((cat) => (
-            <Link
-              key={cat.id}
-              to={`/products?category=${cat.slug}`}
-              className={`category-nav-link text-nowrap ${location.search.includes(cat.slug) ? 'active' : ''}`}
+        <div className="container position-relative px-4">
+          {/* Scroll Left Button */}
+          {canScrollLeft && (
+            <button
+              type="button"
+              className="btn category-nav-scroll-btn start-0"
+              onClick={() => scrollCategories('left')}
+              aria-label="Scroll categories left"
+              title="Scroll left"
             >
-              {cat.name}
+              <i className="bi bi-chevron-left"></i>
+            </button>
+          )}
+
+          {/* Scrollable Categories List */}
+          <div
+            className="category-nav-scroll-wrapper"
+            ref={categoryScrollRef}
+            onScroll={checkCategoryScroll}
+          >
+            <Link to="/offers" className="category-nav-link highlight">
+              <i className="bi bi-percent"></i>Coupons & Deals
             </Link>
-          ))}
-          <Link to="/products?sort=popular" className="category-nav-link ms-auto text-muted text-nowrap">
-            <i className="bi bi-award me-1"></i>Best Sellers
-          </Link>
+            <Link
+              to="/products"
+              className={`category-nav-link ${location.pathname === '/products' && !location.search ? 'active' : ''}`}
+            >
+              All Products
+            </Link>
+            {categories.map((cat) => (
+              <Link
+                key={cat.id}
+                to={`/products?category=${cat.slug}`}
+                className={`category-nav-link ${location.search.includes(cat.slug) ? 'active' : ''}`}
+              >
+                {cat.name}
+              </Link>
+            ))}
+            <Link to="/products?sort=popular" className="category-nav-link best-seller">
+              <i className="bi bi-award text-warning"></i>Best Sellers
+            </Link>
+          </div>
+
+          {/* Scroll Right Button */}
+          {canScrollRight && (
+            <button
+              type="button"
+              className="btn category-nav-scroll-btn end-0"
+              onClick={() => scrollCategories('right')}
+              aria-label="Scroll categories right"
+              title="Scroll right"
+            >
+              <i className="bi bi-chevron-right"></i>
+            </button>
+          )}
         </div>
       </div>
     </header>

@@ -98,11 +98,14 @@ body {
   line-height: 1.6;
 }
 
-/* Flexbox and Grid shrink fix to prevent overflow */
-.row > *,
-.d-flex > *,
-.d-inline-flex > * {
+/* Grid and column flex containment to allow text truncation without blowing out parents */
+.row > * {
   min-width: 0;
+}
+
+/* Explicit utility for containers that need min-width: 0 */
+.min-w-0 {
+  min-width: 0 !important;
 }
 
 /* Fluid Responsive Typography */
@@ -150,10 +153,25 @@ a:hover {
   color: var(--color-primary-hover);
 }
 
+/* Accessible Focus States */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: #F1F5F9;
@@ -206,4 +224,13 @@ a:hover {
   background-color: var(--color-primary) !important;
   border-color: var(--color-primary) !important;
   color: #FFFFFF !important;
+}
+
+/* Disabled button consistency */
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.65;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
