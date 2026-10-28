@@ -30,6 +30,19 @@ const Products = () => {
   const [maxPrice, setMaxPrice] = useState(queryMaxPrice);
   const [inStockOnly, setInStockOnly] = useState(queryInStock);
   const [featuredOnly, setFeaturedOnly] = useState(queryFeatured);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+
+  // Lock body scroll when mobile filter drawer is open
+  useEffect(() => {
+    if (mobileFilterOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileFilterOpen]);
 
   // Sync state when URL params change
   useEffect(() => {
@@ -149,6 +162,15 @@ const Products = () => {
     queryMinPrice || queryMaxPrice || queryInStock || queryFeatured
   );
 
+  const activeFiltersCount = [
+    queryCat && queryCat !== 'all',
+    queryBrand && queryBrand !== 'all',
+    Boolean(queryMinPrice || queryMaxPrice),
+    queryInStock,
+    queryFeatured,
+    Boolean(queryQ)
+  ].filter(Boolean).length;
+
   return (
     <div className="container py-4">
       {/* Breadcrumb Navigation */}
@@ -265,9 +287,248 @@ const Products = () => {
         )}
       </div>
 
+      {/* Mobile Quick Filter & Sort Bar (< lg) */}
+      <div className="d-lg-none mb-3">
+        <div className="d-flex align-items-center justify-content-between bg-white p-2 px-3 rounded-4 border shadow-sm">
+          <button
+            type="button"
+            className="btn btn-shopera-primary btn-sm rounded-pill px-3 py-2 fw-semibold d-flex align-items-center gap-2"
+            onClick={() => setMobileFilterOpen(true)}
+            aria-label="Open filter options"
+          >
+            <i className="bi bi-sliders"></i>
+            <span>Filters</span>
+            {activeFiltersCount > 0 && (
+              <span className="badge bg-white text-primary rounded-pill">{activeFiltersCount}</span>
+            )}
+          </button>
+
+          <div className="d-flex align-items-center gap-2">
+            <span className="small text-muted d-none d-sm-inline">{pagination.total} items &bull;</span>
+            <label htmlFor="mobileSortSelect" className="visually-hidden">Sort</label>
+            <select
+              id="mobileSortSelect"
+              className="form-select form-select-sm rounded-pill border-secondary border-opacity-25 shadow-none"
+              style={{ width: '150px' }}
+              value={selectedSort}
+              onChange={(e) => {
+                setSelectedSort(e.target.value);
+                updateFilters({ sort: e.target.value });
+              }}
+            >
+              <option value="newest">Newest</option>
+              <option value="popular">Popular</option>
+              <option value="price_asc">Price: Low</option>
+              <option value="price_desc">Price: High</option>
+              <option value="rating">Rating</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Filter Drawer / Bottom Sheet */}
+      {mobileFilterOpen && (
+        <>
+          <div
+            className="mobile-filter-backdrop"
+            onClick={() => setMobileFilterOpen(false)}
+            aria-hidden="true"
+          ></div>
+          <div
+            className="mobile-filter-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Filter products"
+          >
+            <div className="mobile-filter-drag-pill"></div>
+            <div className="mobile-filter-header">
+              <div>
+                <h5 className="fw-bold mb-0 text-navy">Filters & Categories</h5>
+                <small className="text-muted">{pagination.total} products available</small>
+              </div>
+              <button
+                type="button"
+                className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                style={{ width: '38px', height: '38px' }}
+                onClick={() => setMobileFilterOpen(false)}
+                aria-label="Close filters"
+              >
+                <i className="bi bi-x-lg fs-6"></i>
+              </button>
+            </div>
+
+            <div className="mobile-filter-body">
+              {/* Categories */}
+              <div className="mb-4">
+                <label className="fw-bold small text-uppercase text-secondary mb-2 d-block">
+                  Categories ({categories.length})
+                </label>
+                <div className="d-flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className={`btn btn-sm rounded-pill px-3 py-1 fw-semibold ${
+                      selectedCategory === 'all' ? 'btn-shopera-primary' : 'btn-outline-secondary'
+                    }`}
+                    onClick={() => {
+                      setSelectedCategory('all');
+                      updateFilters({ category: 'all', brand: 'all' });
+                    }}
+                  >
+                    All Categories
+                  </button>
+                  {categories.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      className={`btn btn-sm rounded-pill px-3 py-1 fw-semibold ${
+                        selectedCategory === c.slug ? 'btn-shopera-primary' : 'btn-outline-secondary'
+                      }`}
+                      onClick={() => {
+                        setSelectedCategory(c.slug);
+                        updateFilters({ category: c.slug, brand: 'all' });
+                      }}
+                    >
+                      {c.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Range */}
+              <div className="mb-4">
+                <label className="fw-bold small text-uppercase text-secondary mb-2 d-block">
+                  Price Range ($ USD)
+                </label>
+                <form onSubmit={handlePriceApply} className="row g-2 align-items-center">
+                  <div className="col-5">
+                    <input
+                      type="number"
+                      className="form-control form-control-sm rounded-3"
+                      placeholder="Min"
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(e.target.value)}
+                    />
+                  </div>
+                  <div className="col-2 text-center text-muted small">&ndash;</div>
+                  <div className="col-5">
+                    <input
+                      type="number"
+                      className="form-control form-control-sm rounded-3"
+                      placeholder="Max"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(e.target.value)}
+                    />
+                  </div>
+                  <div className="col-12 mt-2">
+                    <button type="submit" className="btn btn-shopera-outline btn-sm w-100 rounded-pill">
+                      Apply Price Filter
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Brands */}
+              {availableBrands.length > 0 && (
+                <div className="mb-4">
+                  <label className="fw-bold small text-uppercase text-secondary mb-2 d-block">
+                    Brands ({availableBrands.length})
+                  </label>
+                  <div className="d-flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className={`btn btn-sm rounded-pill px-3 py-1 ${
+                        selectedBrand === 'all' ? 'btn-shopera-primary' : 'btn-outline-secondary'
+                      }`}
+                      onClick={() => {
+                        setSelectedBrand('all');
+                        updateFilters({ brand: 'all' });
+                      }}
+                    >
+                      All Brands
+                    </button>
+                    {availableBrands.map((b) => (
+                      <button
+                        key={b.brand}
+                        type="button"
+                        className={`btn btn-sm rounded-pill px-3 py-1 ${
+                          selectedBrand === b.brand ? 'btn-shopera-primary' : 'btn-outline-secondary'
+                        }`}
+                        onClick={() => {
+                          setSelectedBrand(b.brand);
+                          updateFilters({ brand: b.brand });
+                        }}
+                      >
+                        {b.brand} ({b.count})
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Availability */}
+              <div className="mb-3">
+                <label className="fw-bold small text-uppercase text-secondary mb-2 d-block">
+                  Availability & Deals
+                </label>
+                <div className="form-check form-switch mb-2">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="mobileInStockCheck"
+                    checked={inStockOnly}
+                    onChange={(e) => {
+                      setInStockOnly(e.target.checked);
+                      updateFilters({ in_stock: e.target.checked ? 'true' : '' });
+                    }}
+                  />
+                  <label className="form-check-label small fw-medium" htmlFor="mobileInStockCheck">
+                    In Stock Only
+                  </label>
+                </div>
+                <div className="form-check form-switch">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="mobileFeaturedCheck"
+                    checked={featuredOnly}
+                    onChange={(e) => {
+                      setFeaturedOnly(e.target.checked);
+                      updateFilters({ featured: e.target.checked ? '1' : '' });
+                    }}
+                  />
+                  <label className="form-check-label small fw-medium" htmlFor="mobileFeaturedCheck">
+                    Featured Deals Only
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="mobile-filter-footer">
+              <button
+                type="button"
+                className="btn btn-outline-danger btn-sm rounded-pill px-3 py-2 fw-semibold"
+                onClick={() => {
+                  handleResetFilters();
+                  setMobileFilterOpen(false);
+                }}
+              >
+                Clear All
+              </button>
+              <button
+                type="button"
+                className="btn btn-shopera-primary flex-grow-1 rounded-pill py-2 fw-bold"
+                onClick={() => setMobileFilterOpen(false)}
+              >
+                Show {pagination.total} Products
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
       <div className="row g-4">
         {/* Filter Sidebar */}
-        <div className="col-lg-3">
+        <div className="col-lg-3 d-none d-lg-block">
           <div className="filter-card">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h5 className="fw-bold mb-0 text-navy">Filter Products</h5>
@@ -446,10 +707,10 @@ const Products = () => {
         {/* Product Grid */}
         <div className="col-lg-9">
           {loading ? (
-            <div className="row g-3 g-md-4 product-grid-adaptive">
+            <div className="row g-2 g-sm-3 g-md-4 product-grid-adaptive">
               {[1, 2, 3, 4, 5, 6].map(n => (
-                <div key={n} className="col-12 col-sm-6 col-md-6 col-lg-4 product-col-adaptive">
-                  <div className="card border-0 shadow-sm p-4 text-center rounded-4" style={{ height: '360px' }}>
+                <div key={n} className="col-6 col-md-6 col-lg-4 product-col-adaptive">
+                  <div className="card border-0 shadow-sm p-4 text-center rounded-4" style={{ height: '280px' }}>
                     <div className="spinner-border text-primary m-auto" role="status"></div>
                   </div>
                 </div>
@@ -472,9 +733,9 @@ const Products = () => {
             </div>
           ) : (
             <>
-              <div className="row g-3 g-md-4 product-grid-adaptive">
+              <div className="row g-2 g-sm-3 g-md-4 product-grid-adaptive">
                 {products.map((product) => (
-                  <div key={product.id} className="col-12 col-sm-6 col-md-6 col-lg-4 product-col-adaptive">
+                  <div key={product.id} className="col-6 col-md-6 col-lg-4 product-col-adaptive">
                     <ProductCard product={product} />
                   </div>
                 ))}

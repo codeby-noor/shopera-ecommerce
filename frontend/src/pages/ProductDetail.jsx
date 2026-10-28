@@ -720,6 +720,82 @@ const ProductDetail = () => {
 
       {/* Recently Viewed Products */}
       <RecentlyViewed currentProductId={product.id} />
+
+      {/* Mobile Sticky Bottom Purchase Bar */}
+      <div className="mobile-sticky-purchase-bar d-lg-none">
+        <div className="d-flex align-items-center justify-content-between gap-2">
+          <div className="d-flex align-items-center gap-2 min-w-0">
+            <img
+              src={selectedImage || product.image_url}
+              alt={product.title}
+              className="rounded-2 border flex-shrink-0"
+              style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+            />
+            <div className="min-w-0">
+              <div className="fw-bold text-navy text-truncate" style={{ fontSize: '0.8rem' }}>
+                {product.title}
+              </div>
+              <div className="fw-bold text-primary" style={{ fontSize: '0.92rem' }}>
+                {formatPrice(currentPrice * quantity)}
+              </div>
+            </div>
+          </div>
+
+          <div className="d-flex align-items-center gap-2 flex-shrink-0">
+            {!isOutOfStock && (
+              <div className="qty-stepper qty-stepper-sm">
+                <button
+                  className="qty-stepper-btn"
+                  type="button"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={quantity <= 1}
+                  aria-label="Decrease quantity"
+                >
+                  <i className="bi bi-dash"></i>
+                </button>
+                <span className="qty-stepper-val">{quantity}</span>
+                <button
+                  className="qty-stepper-btn"
+                  type="button"
+                  onClick={() => setQuantity(Math.min(product.stock_quantity, quantity + 1))}
+                  disabled={quantity >= product.stock_quantity}
+                  aria-label="Increase quantity"
+                >
+                  <i className="bi bi-plus"></i>
+                </button>
+              </div>
+            )}
+
+            <button
+              className={`btn btn-sm rounded-pill fw-bold px-3 py-2 d-flex align-items-center gap-1 ${
+                addedToast ? 'btn-success text-white' : 'btn-shopera-primary'
+              }`}
+              onClick={handleAddToCart}
+              disabled={addingToCart || isOutOfStock}
+              style={{ minHeight: '40px' }}
+            >
+              {addedToast ? (
+                <>
+                  <i className="bi bi-check2"></i>
+                  <span>Added!</span>
+                </>
+              ) : addingToCart ? (
+                <>
+                  <span className="spinner-border spinner-border-sm"></span>
+                  <span>...</span>
+                </>
+              ) : isOutOfStock ? (
+                <span>Out of Stock</span>
+              ) : (
+                <>
+                  <i className="bi bi-bag-plus"></i>
+                  <span>Add to Bag</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

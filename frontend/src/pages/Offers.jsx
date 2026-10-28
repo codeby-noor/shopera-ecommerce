@@ -200,9 +200,9 @@ const Offers = () => {
               <div className="spinner-border text-primary m-auto" role="status"></div>
             </div>
           ) : (
-            <div className="row g-4">
+            <div className="row g-2 g-sm-3 g-md-4 product-grid-adaptive">
               {dealProducts.map((product) => (
-                <div key={product.id} className="col-lg-3 col-md-6">
+                <div key={product.id} className="col-6 col-md-4 col-lg-3 product-col-adaptive">
                   <ProductCard product={product} />
                 </div>
               ))}

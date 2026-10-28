@@ -9,6 +9,7 @@ import { CurrencyProvider } from './context/CurrencyContext';
 // Common Components
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
+import BottomNav from './components/common/BottomNav';
 import CompareFloatingBar from './components/common/CompareFloatingBar';
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import AdminRoute from './components/routes/AdminRoute';
@@ -183,6 +184,7 @@ const AppLayout = () => {
       </main>
       {!isAdminPath && <CompareFloatingBar />}
       {!isAdminPath && <Footer />}
+      {!isAdminPath && <BottomNav />}
     </div>
   );
 };

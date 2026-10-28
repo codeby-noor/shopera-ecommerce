@@ -39,6 +39,18 @@ const Navbar = () => {
     setShowSuggestions(false);
   }, [location.pathname, location.search]);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   // Click outside to close search suggestions and mobile menu
   useEffect(() => {
     const handleClickOutside = (e) => {

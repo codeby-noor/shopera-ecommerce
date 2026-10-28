@@ -132,7 +132,7 @@ const About = () => {
                   </div>
                   <span className="badge bg-success bg-opacity-25 text-success small font-monospace">HEALTHY</span>
                 </div>
-                <pre className="text-info font-monospace small mb-0" style={{ maxHeight: '240px', overflowY: 'auto' }}>
+                <pre className="text-info font-monospace small mb-0" style={{ maxHeight: '240px', overflowY: 'auto', overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
 {`{
   "project": "SHOPERA E-Commerce Marketplace",
   "developer": "Mahenoor Shaikh",

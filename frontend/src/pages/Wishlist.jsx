@@ -43,7 +43,7 @@ const Wishlist = () => {
         <p className="text-muted small mb-0">You have {wishlistCount} saved item(s)</p>
       </div>
 
-      <div className="row g-3 g-md-4 product-grid-adaptive">
+      <div className="row g-2 g-sm-3 g-md-4 product-grid-adaptive">
         {wishlistItems.map((product) => {
           const hasDiscount = product.discount_price && Number(product.discount_price) > 0 && Number(product.discount_price) < Number(product.price);
           const currentPrice = hasDiscount ? Number(product.discount_price) : Number(product.price);
@@ -51,7 +51,7 @@ const Wishlist = () => {
           const isOutOfStock = product.stock_quantity <= 0;
 
           return (
-            <div key={product.id} className="col-12 col-sm-6 col-md-4 col-lg-3 product-col-adaptive">
+            <div key={product.id} className="col-6 col-md-4 col-lg-3 product-col-adaptive">
               <div className="product-card h-100">
                 <div className="product-img-box position-relative">
                   <button

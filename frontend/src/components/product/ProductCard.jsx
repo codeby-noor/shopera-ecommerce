@@ -152,7 +152,7 @@ const ProductCard = ({ product }) => {
             {addedNotice ? (
               <>
                 <i className="bi bi-check2-circle fs-5"></i>
-                <span>Added to Cart!</span>
+                <span>Added<span className="d-none d-sm-inline"> to Cart</span>!</span>
               </>
             ) : adding ? (
               <>
@@ -164,7 +164,7 @@ const ProductCard = ({ product }) => {
             ) : (
               <>
                 <i className="bi bi-cart-plus fs-5"></i>
-                <span>Add to Cart</span>
+                <span>Add<span className="d-none d-sm-inline"> to Cart</span></span>
               </>
             )}
           </button>

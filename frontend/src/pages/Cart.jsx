@@ -469,7 +469,7 @@ const Cart = () => {
 
         {/* Right Column: Order Summary Card */}
         <div className="col-lg-4">
-          <div className="card border-0 shadow-lg rounded-4 p-4 sticky-top" style={{ top: '90px' }}>
+          <div className="card border-0 shadow-lg rounded-4 p-4 sticky-top sticky-top-mobile-disable" style={{ top: '90px' }}>
             <h5 className="fw-bold mb-3 pb-2 border-bottom">Order Summary</h5>
 
             <div className="d-flex justify-content-between mb-2">

@@ -123,11 +123,11 @@ const Orders = () => {
                     <div className="col-lg-8">
                       <div className="d-flex flex-column gap-3">
                         {order.items?.map((item, idx) => (
-                          <div key={idx} className="d-flex align-items-center gap-3">
+                          <div key={idx} className="d-flex align-items-center gap-3" style={{ minWidth: 0 }}>
                             <img
                               src={item.product_image}
                               alt={item.product_title}
-                              className="rounded-3 border"
+                              className="rounded-3 border flex-shrink-0"
                               style={{ width: '60px', height: '60px', objectFit: 'cover' }}
                             />
                             <div className="flex-grow-1">

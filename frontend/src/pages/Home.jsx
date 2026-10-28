@@ -70,18 +70,18 @@ const Home = () => {
               </div>
 
               {/* Marketplace Live Trust Counters */}
-              <div className="d-flex flex-wrap gap-4 mt-5 pt-3 border-top border-secondary border-opacity-25">
-                <div>
-                  <h4 className="fw-bold mb-0 text-white">100% Free</h4>
-                  <small className="text-secondary">Express Delivery over $500</small>
+              <div className="row g-2 g-sm-3 mt-4 mt-md-5 pt-3 border-top border-secondary border-opacity-25 text-center text-sm-start">
+                <div className="col-4">
+                  <h5 className="fw-bold mb-0 text-white fs-6 fs-sm-5">100% Free</h5>
+                  <small className="text-secondary d-block" style={{ fontSize: '0.72rem' }}>Express over $500</small>
                 </div>
-                <div>
-                  <h4 className="fw-bold mb-0 text-white">4.9 / 5.0</h4>
-                  <small className="text-secondary">Verified Customer Reviews</small>
+                <div className="col-4">
+                  <h5 className="fw-bold mb-0 text-white fs-6 fs-sm-5">4.9 / 5.0</h5>
+                  <small className="text-secondary d-block" style={{ fontSize: '0.72rem' }}>Verified Reviews</small>
                 </div>
-                <div>
-                  <h4 className="fw-bold mb-0 text-white">30-Day</h4>
-                  <small className="text-secondary">Hassle-Free Easy Returns</small>
+                <div className="col-4">
+                  <h5 className="fw-bold mb-0 text-white fs-6 fs-sm-5">30-Day</h5>
+                  <small className="text-secondary d-block" style={{ fontSize: '0.72rem' }}>Easy Returns</small>
                 </div>
               </div>
             </div>
@@ -170,21 +170,34 @@ const Home = () => {
       </section>
 
       {/* 3. Shop by Category Departments */}
-      <section className="container mt-5 pt-3">
-        <div className="d-flex justify-content-between align-items-end mb-4">
+      <section className="container mt-4 mt-md-5 pt-3">
+        <div className="d-flex justify-content-between align-items-end mb-3 mb-md-4">
           <div>
             <span className="text-primary fw-bold text-uppercase small tracking-wider">Curated Collections</span>
             <h2 className="fw-bold mb-0">Explore Departments</h2>
           </div>
-          <Link to="/products" className="fw-bold text-primary text-decoration-none d-flex align-items-center gap-1">
-            <span>View All Categories</span>
+          <Link to="/products" className="fw-bold text-primary text-decoration-none d-flex align-items-center gap-1 small">
+            <span>View All</span>
             <i className="bi bi-arrow-right fs-6"></i>
           </Link>
         </div>
 
-        <div className="row g-4">
+        {/* Mobile Horizontal Category Cards Touch Track */}
+        <div className="mobile-categories-scroll-track d-md-none">
           {categories.map((category) => (
-            <div key={category.id} className="col-lg-2 col-md-4 col-6">
+            <Link key={category.id} to={`/products?category=${category.slug}`} className="mobile-category-card-item">
+              <div className="mobile-category-card-thumb">
+                <img src={category.image_url} alt={category.name} loading="lazy" />
+              </div>
+              <span className="mobile-category-card-title">{category.name}</span>
+            </Link>
+          ))}
+        </div>
+
+        {/* Desktop & Tablet Categories Grid */}
+        <div className="row g-4 d-none d-md-flex">
+          {categories.map((category) => (
+            <div key={category.id} className="col-lg-2 col-md-4">
               <Link to={`/products?category=${category.slug}`} className="category-card">
                 <div className="category-img-wrap">
                   <img src={category.image_url} alt={category.name} loading="lazy" />
@@ -200,32 +213,32 @@ const Home = () => {
       </section>
 
       {/* 4. Featured Marketplace Products */}
-      <section className="container mt-5 pt-4">
-        <div className="d-flex justify-content-between align-items-end mb-4">
+      <section className="container mt-4 mt-md-5 pt-3 pt-md-4">
+        <div className="d-flex justify-content-between align-items-end mb-3 mb-md-4">
           <div>
             <span className="text-primary fw-bold text-uppercase small tracking-wider">Staff Picks & Trending</span>
             <h2 className="fw-bold mb-0">Featured Products</h2>
           </div>
-          <Link to="/products?featured=1" className="fw-bold text-primary text-decoration-none d-flex align-items-center gap-1">
-            <span>Explore All Featured</span>
+          <Link to="/products?featured=1" className="fw-bold text-primary text-decoration-none d-flex align-items-center gap-1 small">
+            <span>Explore All</span>
             <i className="bi bi-arrow-right fs-6"></i>
           </Link>
         </div>
 
         {loading ? (
-          <div className="row g-3 g-md-4 product-grid-adaptive">
+          <div className="row g-2 g-sm-3 g-md-4 product-grid-adaptive">
             {[1, 2, 3, 4].map((n) => (
-              <div key={n} className="col-12 col-sm-6 col-md-4 col-lg-3 product-col-adaptive">
-                <div className="card border-0 shadow-sm p-4 text-center rounded-4" style={{ height: '360px' }}>
+              <div key={n} className="col-6 col-md-4 col-lg-3 product-col-adaptive">
+                <div className="card border-0 shadow-sm p-4 text-center rounded-4" style={{ height: '280px' }}>
                   <div className="spinner-border text-primary m-auto" role="status"></div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="row g-3 g-md-4 product-grid-adaptive">
+          <div className="row g-2 g-sm-3 g-md-4 product-grid-adaptive">
             {featuredProducts.map((product) => (
-              <div key={product.id} className="col-12 col-sm-6 col-md-4 col-lg-3 product-col-adaptive">
+              <div key={product.id} className="col-6 col-md-4 col-lg-3 product-col-adaptive">
                 <ProductCard product={product} />
               </div>
             ))}
